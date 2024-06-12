@@ -1,8 +1,7 @@
 # Ignore datasets
 
-lamem/*
+/flickr30k_entities/*
 
-MemCat/*
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/jupyternotebooks,python,visualstudiocode
