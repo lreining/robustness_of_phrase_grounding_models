@@ -1,7 +1,7 @@
 import benepar, spacy
 import networkx as nx
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 benepar.download("benepar_en3")
 nlp = spacy.load("en_core_web_sm")
@@ -39,7 +39,7 @@ class SyntacticTree:
         self.root = self.build_tree(sent)
 
     def get_max_height(self):
-        counts = [1]
+        counts = [0]
         final_counts = []
         nodes = [self.root]
         while len(nodes)!=0:
@@ -52,20 +52,25 @@ class SyntacticTree:
         return max(final_counts)
 
     def get_sentence_parts_for_level(self,level):
-        if level>self.get_max_height():
+        max_height = self.get_max_height()
+        if level<0:
+            level = max_height+level+1
+
+        if level>self.get_max_height() or level<0:
             raise ValueError
 
         sentences = []
         nodes = [self.root]
-        counts = [1]
+        counts = [0]
+
         while len(nodes) != 0:
-            c, n = counts.pop(), nodes.pop()
+            c, n = counts.pop(0), nodes.pop(0)
             if len(n.children)!=0 and c+1<=level:
                 nodes = n.children + nodes
                 counts = [c+1 for _ in n.children] + counts
             else:
                 if str(n.sentence) != ".":
-                    sentences = [n.sentence]+sentences
+                    sentences += [n.sentence]
         return sentences
 
     def build_tree(self, sent):
