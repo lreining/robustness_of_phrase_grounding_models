@@ -59,6 +59,7 @@ class SyntacticTree:
         if level>self.get_max_height() or level<0:
             raise ValueError
 
+        identifiers = []
         sentences = []
         nodes = [self.root]
         counts = [0]
@@ -71,7 +72,8 @@ class SyntacticTree:
             else:
                 if str(n.sentence) != ".":
                     sentences += [n.sentence]
-        return sentences
+                    identifiers += [n.identifier]
+        return sentences,identifiers
 
     def build_tree(self, sent):
         if sent is None:
