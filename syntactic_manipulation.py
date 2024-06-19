@@ -33,10 +33,13 @@ def scramble_phrase(sentence,level, phrase_idx_bounds, seed=1):
     np.random.shuffle(sub_phrases)
     return sub_phrases
 
-def scramble(sentence, level, phrase_idx_bounds, seed=1):
+def scramble(sentence, level, phrase_idx_bounds, seed=1, is_phrase_scrambled=False):
     masked_sentence = mask_phrase(sentence, phrase_idx_bounds)
     sub_sentences = scramble_sentence(masked_sentence, level, seed)
-    sub_phrases = scramble_phrase(sentence, level, phrase_idx_bounds, seed)
+    if is_phrase_scrambled:
+        sub_phrases = scramble_phrase(sentence, level, phrase_idx_bounds, seed)
+    else:
+        sub_phrases = []
     sub_sentences, sub_phrases = join_sentence(sub_sentences), join_sentence(sub_phrases)
     if len(sub_phrases) == 0:
         sub_phrases = sentence[phrase_idx_bounds[0]:phrase_idx_bounds[1]]
