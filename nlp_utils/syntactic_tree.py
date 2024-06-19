@@ -1,7 +1,6 @@
 import benepar, spacy
 import networkx as nx
 import matplotlib.pyplot as plt
-import numpy as np
 
 benepar.download("benepar_en3")
 nlp = spacy.load("en_core_web_sm")
@@ -51,33 +50,38 @@ class SyntacticTree:
                 final_counts.append(c)
         return max(final_counts)
 
-    def get_sentence_parts_for_level(self,level):
+    def get_sentence_nodes_for_level(self, level):
         max_height = self.get_max_height()
-        if level<0:
-            level = max_height+level+1
+        if level < 0:
+            level = max_height + level + 1
 
-        if level>self.get_max_height() or level<0:
+        if level > self.get_max_height() or level < 0:
             raise ValueError
 
-        identifiers = []
-        sentences = []
+
+        final_nodes = []
         nodes = [self.root]
         counts = [0]
 
         while len(nodes) != 0:
             c, n = counts.pop(0), nodes.pop(0)
-            if len(n.children)!=0 and c+1<=level:
+            if len(n.children) != 0 and c + 1 <= level:
                 nodes = n.children + nodes
-                counts = [c+1 for _ in n.children] + counts
+                counts = [c + 1 for _ in n.children] + counts
             else:
                 if str(n.sentence) != ".":
-                    sentences += [n.sentence]
-                    identifiers += [n.identifier]
+                    final_nodes += [n]
+        return final_nodes
+
+    def get_sentence_parts_for_level(self,level):
+        nodes = self.get_sentence_nodes_for_level(level)
+        sentences = list(map(lambda n:n.sentence, nodes))
+        identifiers = list(map(lambda n:n.identifier, nodes))
         return sentences,identifiers
 
     def build_tree(self, sent):
         if sent is None:
-            return
+            return None
         label = sent._.labels[0] if len(sent._.labels)!=0 else ""
         node = self.Node(sent, label)
         for child in sent._.children:
@@ -85,6 +89,7 @@ class SyntacticTree:
             if child_node is not None:
                 node.children.append(child_node)
         return node
+
 
     def show(self,figsize=None):
         figsize = figsize if figsize is not None else (10,10)
