@@ -1,9 +1,9 @@
 import itertools
-
+from tqdm import tqdm
 import numpy as np
 
 from dataset_utils.syntactic_tree import SyntacticTree
-
+from torch_geometric.transforms import BaseTransform
 MASK = "XXXX"
 
 def scramble_sentence(sentence, level,seed=1):
@@ -77,3 +77,24 @@ def unmask_phrase(sentence, phrase,add=""):
     idx = sentence.find(MASK+add)
     sentence = sentence[:idx] + phrase + sentence[idx+len(MASK+add):]
     return sentence, [idx, idx+len(phrase+add)]
+
+class ScrambledSentence(BaseTransform):
+    def __init__(self, level, seed=1):
+        """
+        Initializes a ScrambledSentence object to scramble the captions
+        within the dataset.
+
+        Parameters:
+        - level (int): The level of scrambling for the sentence.
+        - seed (int): The seed value for randomization (default is 1).
+        """
+        self.level = level
+        self.seed = seed
+    
+    def __call__(self, data):
+        for sample in tqdm(data):
+            sentence = sample[1]["caption"]
+            scrambled_sentence, scrambled_phrase_positions = scramble_with_multiple_phrases(sentence, np.array(sample[1]["tokens_positive"]).reshape(-1,2), self.level, self.seed)
+            sample[1]["scrambled_caption"] = scrambled_sentence
+            sample[1]["scrambled_tokens_positive"] = scrambled_phrase_positions
+        return data
