@@ -2,16 +2,9 @@ import itertools
 
 import numpy as np
 
-from nlp_utils.syntactic_tree import SyntacticTree
+from dataset_utils.syntactic_tree import SyntacticTree
 
 MASK = "XXXX"
-def get_sentence_permutations(sentence, level):
-    #TODO: include scrambling of phrase
-    tree = SyntacticTree(sentence)
-    subsentences,_ = tree.get_sentence_parts_for_level(level)
-    permutations = list(itertools.permutations(subsentences))
-    permutations.remove(tuple(subsentences))
-    return permutations
 
 def scramble_sentence(sentence, level,seed=1):
     tree = SyntacticTree(sentence)
@@ -20,20 +13,45 @@ def scramble_sentence(sentence, level,seed=1):
     np.random.shuffle(subsentences)
     return subsentences
 
+
 def scramble_phrase(sentence,level, phrase_idx_bounds, seed=1):
     tree = SyntacticTree(sentence)
     sub_sentences,_ = tree.get_sentence_parts_for_level(level)
     sub_phrases = []
     idx = 0
     for sub_sentence in sub_sentences:
-        if idx >= phrase_idx_bounds[0] and idx <= phrase_idx_bounds[1]:
+        if idx >= phrase_idx_bounds[0] and idx < phrase_idx_bounds[1]:
             sub_phrases.append(sub_sentence)
         idx += len(str(sub_sentence))+1
     np.random.seed(seed)
     np.random.shuffle(sub_phrases)
     return sub_phrases
 
-def scramble(sentence, level, phrase_idx_bounds, seed=1, is_phrase_scrambled=False):
+def scramble_with_multiple_phrases(sentence, phrase_idx_bounds, level, seed=1, is_phrase_scrambled=False):
+    masked_sentence = sentence
+    decrement = 0
+    for i,idx in enumerate(phrase_idx_bounds):
+        masked_sentence = mask_phrase(masked_sentence, [idx[0] - decrement, idx[1] - decrement], str(i))
+        decrement += idx[1]-idx[0]-len(MASK+str(i))
+    sub_sentences = scramble_sentence(masked_sentence, level, seed)
+    sub_phrases = []
+    if is_phrase_scrambled:
+        for idx in phrase_idx_bounds:
+            sub_phrases.append(join_sentence(scramble_phrase(sentence, level, idx, seed)))
+    else:
+        sub_phrases = []
+
+    if len(sub_phrases) == 0:
+        for idx in phrase_idx_bounds:
+            sub_phrases.append(sentence[idx[0]:idx[1]])
+    sub_sentences = join_sentence(sub_sentences)
+    new_phrase_idx_bounds = []
+    for i, sub_phrase in enumerate(sub_phrases):
+        sub_sentences, b = unmask_phrase(sub_sentences, sub_phrase, str(i))
+        new_phrase_idx_bounds.append(b)
+    return sub_sentences.lower(), new_phrase_idx_bounds
+
+def scramble(sentence, phrase_idx_bounds,level, seed=1, is_phrase_scrambled=False):
     masked_sentence = mask_phrase(sentence, phrase_idx_bounds)
     sub_sentences = scramble_sentence(masked_sentence, level, seed)
     if is_phrase_scrambled:
@@ -43,26 +61,19 @@ def scramble(sentence, level, phrase_idx_bounds, seed=1, is_phrase_scrambled=Fal
     sub_sentences, sub_phrases = join_sentence(sub_sentences), join_sentence(sub_phrases)
     if len(sub_phrases) == 0:
         sub_phrases = sentence[phrase_idx_bounds[0]:phrase_idx_bounds[1]]
-    return unmask_phrase(sub_sentences, sub_phrases)
+    s, b = unmask_phrase(sub_sentences, sub_phrases)
+    return s.lower(), b
 
-def mask_phrase(sentence, phrase_idx_bounds):
+def mask_phrase(sentence, phrase_idx_bounds,add=""):
     start_idx, end_idx = phrase_idx_bounds
-    sentence = sentence[:start_idx]+MASK+sentence[end_idx:]
+    sentence = sentence[:start_idx]+MASK+add+sentence[end_idx:]
     return sentence
 
 def join_sentence(subsentences):
     subsentences = list(map(str, subsentences))
     return " ".join(subsentences)
 
-def unmask_phrase(sentence, phrase):
-    idx = sentence.find(MASK)
-    sentence = sentence[:idx] + phrase + sentence[idx+len(MASK):]
-    return sentence.lower(), [idx, idx+len(phrase)]
-
-def scramble_sentence_for_flickr_phrase_annotation(sentence, phrase_config, level,seed=1):
-    idx = phrase_config["first_word_index"]
-    phrase = phrase_config["phrase"]
-    sentence, phrase_idx_bounds = scramble_phrase(sentence, level, [idx, idx+len(phrase)-1], seed)
-    phrase_config["phrase"] = sentence[phrase_idx_bounds[0]:phrase_idx_bounds[1]+1]
-    phrase_config["first_word_index"] = phrase_idx_bounds[0]
-    return sentence, phrase_config
+def unmask_phrase(sentence, phrase,add=""):
+    idx = sentence.find(MASK+add)
+    sentence = sentence[:idx] + phrase + sentence[idx+len(MASK+add):]
+    return sentence, [idx, idx+len(phrase+add)]
