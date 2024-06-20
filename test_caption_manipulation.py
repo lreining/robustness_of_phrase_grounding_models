@@ -1,5 +1,5 @@
 # %%
-from syntactic_manipulation import ScrambledSentence, scramble_with_multiple_phrases
+from syntactic_manipulation import ScrambledSentence
 from dataset_utils.ModulatedDetection import ModulatedDetection
 from transformers import RobertaTokenizerFast
 
@@ -13,5 +13,5 @@ ann_file = "final_flickr_mergedGT_test.json"
 tokenizer = RobertaTokenizerFast.from_pretrained("roberta-base")
 dataset = ModulatedDetection(image_path, ann_file, None, True, tokenizer, False)
 # %%
-tsfm = ScrambledSentence(2,1)
+tsfm = ScrambledSentence(-1,1)
 dataset2 = tsfm(dataset)

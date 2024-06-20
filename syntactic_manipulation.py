@@ -27,6 +27,7 @@ def scramble_phrase(sentence,level, phrase_idx_bounds, seed=1):
     return sub_phrases
 
 def scramble(sentence, phrase_idx_bounds, level, seed=1, is_phrase_scrambled=False):
+    phrase_idx_bounds = phrase_idx_bounds[phrase_idx_bounds[:,0].argsort()]
     masked_sentence = sentence
     decrement = 0
     for i,idx in enumerate(phrase_idx_bounds):
@@ -57,10 +58,12 @@ def unmask_phrases(sentence, phrases,mask=None):
     idx = sentence.find(mask)
     while idx != -1:
         complete_mask = sentence[idx:].split(" ")[0]
+
         phrase_idx = int(complete_mask.replace(mask,""))
         phrase = phrases[phrase_idx]
         sentence = "".join([sentence[:idx], phrase, sentence[idx+len(complete_mask):]])
         phrases[phrase_idx] = [idx, idx+len(phrase)]
+
         idx = sentence.find(mask)
     return sentence.lower(), phrases
 

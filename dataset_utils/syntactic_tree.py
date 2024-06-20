@@ -55,7 +55,10 @@ class SyntacticTree:
         if level < 0:
             level = max_height + level + 1
 
-        if level > self.get_max_height() or level < 0:
+
+        if level > max_height or level < 0:
+            print(level)
+            print(max_height)
             raise ValueError
 
 
