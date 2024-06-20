@@ -27,8 +27,8 @@ class SyntacticTree:
 
     class Node:
         def __init__(self, s, identifier):
-            self.sentence = s
-            self.identifier = identifier
+            self.sentence = str(s)
+            self.identifier = str(identifier)
             self.children = []
 
     def __init__(self, sentence):
