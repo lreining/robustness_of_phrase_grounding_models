@@ -83,7 +83,9 @@ class ScrambledSentence(BaseTransform):
     def __call__(self, data):
         for sample in tqdm(data):
             sentence = sample[1]["caption"]
-            scrambled_sentence, scrambled_phrase_positions = scramble(sentence, np.array(sample[1]["tokens_positive"]).reshape(-1,2), self.level, self.seed)
+            phrase_positions = np.array(sample[1]["tokens_positive"]).reshape(-1,2)
+            unique_phrases, inverse = np.unique(phrase_positions, axis=0, return_inverse=True)
+            scrambled_sentence, scrambled_phrase_positions = scramble(sentence, unique_phrases, self.level, self.seed)
             sample[1]["scrambled_caption"] = scrambled_sentence
-            sample[1]["scrambled_tokens_positive"] = scrambled_phrase_positions
+            sample[1]["scrambled_tokens_positive"] =np.array(scrambled_phrase_positions)[np.array(inverse)]
         return data

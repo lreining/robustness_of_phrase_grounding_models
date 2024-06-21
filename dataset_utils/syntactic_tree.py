@@ -3,7 +3,15 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 benepar.download("benepar_en3")
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm",disable=['ner'])
+
+@spacy.Language.component("disable_sentence_segmentation")
+def disable_sentence_segmentation(doc):
+    for token in doc:
+        token.is_sent_start = False
+    return doc
+nlp.add_pipe('disable_sentence_segmentation', before='parser')
+
 nlp.add_pipe("benepar", config={"model": "benepar_en3"})
 
 def hierarchy_pos_digraph(G, root, width=1., vert_gap=0.1, vert_loc=0., xcenter=0.5, pos=None):
@@ -34,8 +42,7 @@ class SyntacticTree:
     def __init__(self, sentence):
         self.sentence = sentence
         doc = nlp(sentence)
-        sent = list(doc.sents)[0]
-        self.root = self.build_tree(sent)
+        self.root = self.build_tree(list(doc.sents)[0])
 
     def get_max_height(self):
         counts = [0]
