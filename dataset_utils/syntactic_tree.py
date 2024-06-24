@@ -3,7 +3,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 benepar.download("benepar_en3")
-nlp = spacy.load("en_core_web_sm",disable=['ner'])
+nlp = spacy.load("en_core_web_sm",disable=['ner', 'tok2vec'])
 
 @spacy.Language.component("disable_sentence_segmentation")
 def disable_sentence_segmentation(doc):
@@ -56,6 +56,7 @@ class SyntacticTree:
             else:
                 final_counts.append(c)
         return max(final_counts)
+
 
     def get_sentence_nodes_for_level(self, level):
         max_height = self.get_max_height()
