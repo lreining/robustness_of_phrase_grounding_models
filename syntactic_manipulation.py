@@ -1,20 +1,27 @@
 from tqdm import tqdm
 import numpy as np
 from dataset_utils.syntactic_tree import SyntacticTree
-from torch_geometric.transforms import BaseTransform
+from copy import deepcopy
 
 MASK = "XXXX"
 
-def scramble_sentence(sentence, level,seed=1):
+def scramble_sentence(sentence, level,rng=None):
+    if not rng:
+        rng = np.random.default_rng()
     tree = SyntacticTree(sentence)
+    if level < 1 and level > 0:
+        level = np.ceil(tree.get_max_height()*level)
     subsentences, _ = tree.get_sentence_parts_for_level(level)
-    np.random.seed(seed)
-    np.random.shuffle(subsentences)
+    rng.shuffle(subsentences)
     return subsentences
 
 
-def scramble_phrase(sentence,level, phrase_idx_bounds, seed=1):
+def scramble_phrase(sentence,level, phrase_idx_bounds, rng=None):
+    if not rng:
+        rng = np.random.default_rng()
     tree = SyntacticTree(sentence)
+    if level < 1 and level > 0:
+        level = np.ceil(tree.get_max_height()*level)
     sub_sentences,_ = tree.get_sentence_parts_for_level(level)
     sub_phrases = []
     idx = 0
@@ -22,11 +29,12 @@ def scramble_phrase(sentence,level, phrase_idx_bounds, seed=1):
         if idx >= phrase_idx_bounds[0] and idx < phrase_idx_bounds[1]:
             sub_phrases.append(sub_sentence)
         idx += len(sub_sentence)+1
-    np.random.seed(seed)
-    np.random.shuffle(sub_phrases)
+    rng.shuffle(sub_phrases)
     return sub_phrases
 
-def scramble(sentence, phrase_idx_bounds, level, seed=1, is_phrase_scrambled=False):
+def scramble(sentence, phrase_idx_bounds, level, rng=None, is_phrase_scrambled=False):
+    if not rng:
+        rng = np.random.default_rng()
     phrase_idx_bounds = phrase_idx_bounds[phrase_idx_bounds[:,0].argsort()]
     masked_sentence = sentence
     decrement = 0
@@ -34,11 +42,11 @@ def scramble(sentence, phrase_idx_bounds, level, seed=1, is_phrase_scrambled=Fal
         mask = "".join([MASK,str(i)])
         masked_sentence = mask_phrase(masked_sentence, [idx[0] - decrement, idx[1] - decrement], mask)
         decrement += idx[1]-idx[0]-len(mask)
-    sub_sentences = scramble_sentence(masked_sentence, level, seed)
+    sub_sentences = scramble_sentence(masked_sentence, level, rng)
     if is_phrase_scrambled:
         sub_phrases = []
         for idx in phrase_idx_bounds:
-            sub_phrase = " ".join(scramble_phrase(sentence, level, idx, seed))
+            sub_phrase = " ".join(scramble_phrase(sentence, level, idx, rng))
             sub_phrase = sentence[idx[0]:idx[1]] if len(sub_phrase)==0 else sub_phrase
             sub_phrases.append(sub_phrase)
     else:
@@ -67,25 +75,54 @@ def unmask_phrases(sentence, phrases,mask=None):
         idx = sentence.find(mask)
     return sentence.lower(), phrases
 
-class ScrambledSentence(BaseTransform):
-    def __init__(self, level, seed=1):
-        """
-        Initializes a ScrambledSentence object to scramble the captions
-        within the dataset.
+def is_masked_sentence_deeper_than(sentence, phrase_idx_bounds, threshold):
+    phrase_idx_bounds = phrase_idx_bounds[phrase_idx_bounds[:,0].argsort()]
+    masked_sentence = sentence
+    decrement = 0
+    for i,idx in enumerate(phrase_idx_bounds):
+        mask = "".join([MASK,str(i)])
+        masked_sentence = mask_phrase(masked_sentence, [idx[0] - decrement, idx[1] - decrement], mask)
+        decrement += idx[1]-idx[0]-len(mask)
+    tree = SyntacticTree(masked_sentence)
+    if tree.get_max_height() > threshold:
+        return True
+    else:
+        return False
 
-        Parameters:
-        - level (int): The level of scrambling for the sentence.
-        - seed (int): The seed value for randomization (default is 1).
-        """
-        self.level = level
-        self.seed = seed
-    
-    def __call__(self, data):
-        for sample in tqdm(data):
-            sentence = sample[1]["caption"]
-            phrase_positions = np.array(sample[1]["tokens_positive"]).reshape(-1,2)
-            unique_phrases, inverse = np.unique(phrase_positions, axis=0, return_inverse=True)
-            scrambled_sentence, scrambled_phrase_positions = scramble(sentence, unique_phrases, self.level, self.seed)
-            sample[1]["scrambled_caption"] = scrambled_sentence
-            sample[1]["scrambled_tokens_positive"] =np.array(scrambled_phrase_positions)[np.array(inverse)]
-        return data
+
+def scramble_dataset(dataset, level, rng=None):
+    """
+    Scrambles the captions in the given dataset according to the specified level
+    of scrambling and returns a copy of the dataset in which the captions are
+    scrambled.
+
+    Parameters:
+    - dataset (list of dict): The dataset to be scrambled. Each element in the list is a dictionary representing
+      a data sample, which must include a 'caption' key with the sentence to be scrambled.
+    - level (float): The level of scrambling to apply. Higher values result in
+      more scrambled sentences. -1 indicates filtering at word level (for each
+      sentence lowest possible level is selected for scrambling). Values between
+      zero and one indicate the fraction of the depth of the sentence structure
+      at which to sample.
+    - rng (optional): The random number generator used in scrambling. Defaults to None.
+
+    Returns:
+    - list of dict: A new dataset with scrambled sentences. Each element in the list is a dictionary similar
+      to the input dataset but with the 'caption' key containing the scrambled
+      sentence and the tokens_positive_eval containing the locations of the
+      scrambled phrases.
+    """
+    if not rng:
+        rng = np.random.default_rng()
+    dataset = deepcopy(dataset)
+    dataset["images"] = deepcopy(dataset["images"])
+    excluded_counter = 0
+    for i, image in enumerate(tqdm(dataset["images"])):
+        sentence = image["caption"]
+        phrase_positions = np.array(image["tokens_positive_eval"]).reshape(-1,2)
+        unique_phrases, inverse = np.unique(phrase_positions, axis=0, return_inverse=True)
+        scrambled_sentence, scrambled_phrase_positions = scramble(sentence, unique_phrases, level, rng)
+        image["caption"] = scrambled_sentence
+        image["tokens_positive_eval"] = np.array(scrambled_phrase_positions)[np.array(inverse)].reshape(-1,1,2).tolist()
+    print(f"Excluded {excluded_counter} samples.")
+    return dataset
