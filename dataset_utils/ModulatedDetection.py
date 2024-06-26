@@ -1,4 +1,7 @@
-"""Code below taken from https://github.com/facebookresearch/multimodal
+"""
+We ended up not using this code as we exported the manipulated datasets as json and not as DataLoader objects.
+
+Code below taken from https://github.com/facebookresearch/multimodal
 
 The code remains under the following license:
 
