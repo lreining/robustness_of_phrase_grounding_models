@@ -1,3 +1,4 @@
+metric, avg
 Recall@1_all,0.7680259833994948
 Recall@1_animals,0.9064449064449065
 Recall@1_bodyparts,0.6070038910505836
