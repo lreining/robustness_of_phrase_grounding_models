@@ -3,7 +3,7 @@ import json
 
 import numpy as np
 from tqdm import tqdm
-from syntactic_manipulation import is_masked_sentence_deeper_than, scramble_dataset
+from dataset_utils.syntactic_manipulation import is_masked_sentence_deeper_than, scramble_dataset
 
 # %%
 annotation_file = "flickr_test_datasets/final_flickr_separateGT_test.json"

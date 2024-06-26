@@ -1,6 +1,6 @@
 from tqdm import tqdm
 import numpy as np
-from dataset_utils.syntactic_tree import SyntacticTree
+from syntactic_tree import SyntacticTree
 from copy import deepcopy
 
 MASK = "XXXX"
