@@ -90,7 +90,7 @@ def is_masked_sentence_deeper_than(sentence, phrase_idx_bounds, threshold):
         return False
 
 
-def scramble_dataset(dataset, level, rng=None):
+def scramble_dataset(dataset, level, is_phrase_scrambled=False, rng=None):
     """
     Scrambles the captions in the given dataset according to the specified level
     of scrambling and returns a copy of the dataset in which the captions are
@@ -104,7 +104,10 @@ def scramble_dataset(dataset, level, rng=None):
       sentence lowest possible level is selected for scrambling). Values between
       zero and one indicate the fraction of the depth of the sentence structure
       at which to sample.
-    - rng (optional): The random number generator used in scrambling. Defaults to None.
+    - is_phrase_scrambled: If True, not only the phrases are scrambled but also
+      the words within a phrase are scrambled.
+    - rng (optional): The random number generator used in scrambling. Defaults
+      to None.
 
     Returns:
     - list of dict: A new dataset with scrambled sentences. Each element in the list is a dictionary similar
@@ -121,8 +124,7 @@ def scramble_dataset(dataset, level, rng=None):
         sentence = image["caption"]
         phrase_positions = np.array(image["tokens_positive_eval"]).reshape(-1,2)
         unique_phrases, inverse = np.unique(phrase_positions, axis=0, return_inverse=True)
-        scrambled_sentence, scrambled_phrase_positions = scramble(sentence, unique_phrases, level, rng)
+        scrambled_sentence, scrambled_phrase_positions = scramble(sentence, unique_phrases, level, rng, is_phrase_scrambled=is_phrase_scrambled)
         image["caption"] = scrambled_sentence
         image["tokens_positive_eval"] = np.array(scrambled_phrase_positions)[np.array(inverse)].reshape(-1,1,2).tolist()
-    print(f"Excluded {excluded_counter} samples.")
     return dataset

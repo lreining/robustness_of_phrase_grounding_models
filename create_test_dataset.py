@@ -69,3 +69,16 @@ dataset_scrambled = scramble_dataset(dataset, level=2/3, rng=rng)
 dataset_scrambled_file = "flickr_test_datasets/final_flickr_separateGT_test_scrambled_point66.json"
 with open(dataset_scrambled_file, 'w') as f:
     json.dump(dataset_scrambled, f)
+
+# %%
+# scramble sentences of the dataset with scrambling at word level and also
+# scramble words within phrases
+with open(filtered_dataset_file, "r") as f:
+    dataset = json.load(f)
+seed = 46
+rng = np.random.default_rng(seed)
+dataset_scrambled = scramble_dataset(dataset, level=-1, is_phrase_scrambled=True, rng=rng)
+dataset_scrambled_file = "flickr_test_datasets/final_flickr_separateGT_test_scrambled_-1_scramble_within.json"
+with open(dataset_scrambled_file, 'w') as f:
+    json.dump(dataset_scrambled, f)
+# %%
