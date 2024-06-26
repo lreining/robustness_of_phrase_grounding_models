@@ -1,7 +1,7 @@
 # Ignore datasets
 
 /flickr30k_entities/*
-
+.DS_Store
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/jupyternotebooks,python,visualstudiocode
