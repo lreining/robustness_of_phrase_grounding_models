@@ -44,20 +44,28 @@ class SyntacticTree:
         doc = nlp(sentence)
         self.root = self.build_tree(list(doc.sents)[0])
 
-    def get_max_height(self):
+    def get_widths(self):
+        counts = []
+        nodes = [self.root]
+        while len(nodes)!=0:
+            n = nodes.pop()
+            if len(n.children) !=0:
+                nodes += n.children
+                counts += [len(n.children)]
+        return counts
+
+    def get_heights(self):
         counts = [0]
         final_counts = []
         nodes = [self.root]
-        while len(nodes)!=0:
+        while len(nodes) != 0:
             c, n = counts.pop(), nodes.pop()
-            if len(n.children)!=0:
+            if len(n.children) != 0:
                 nodes += n.children
-                counts += [c+1 for _ in n.children]
+                counts += [c + 1 for _ in n.children]
             else:
                 final_counts.append(c)
-        return max(final_counts)
-
-
+        return final_counts
     def get_sentence_nodes_for_level(self, level):
         max_height = self.get_max_height()
         if level < 0:
@@ -140,3 +148,4 @@ class SyntacticTree:
         nx.draw_networkx_nodes(G, pos=pos_nodes,nodelist=nodes, edgecolors="black", node_color="skyblue", node_size=200)
         nx.draw_networkx_nodes(G, pos=pos_leaves, nodelist=leaves, edgecolors="None", node_color="None", node_size=200)
         plt.show()
+
