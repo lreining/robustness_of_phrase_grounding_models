@@ -3,6 +3,7 @@ import os
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import numpy as np
 # %%
 evaluation_path = "evaluation_results"
 models = ["glip_large_model", "glip_tiny_model_o365_goldg_cc_sbu", "glip_tiny_model_o365_goldg", "mdetr", "fiber"]
@@ -27,10 +28,11 @@ for model in models:
         performances.append(data[manipulation][model].loc[metric][0])
     sns.scatterplot(x=manipulations_label, y=performances)
 plt.legend(model_labels)
-plt.xlabel("Manipulation applied to flicker30k", fontdict={"size": 13})
+plt.xlabel("Manipulation applied to flickr30k", fontdict={"size": 13})
 plt.ylabel(metric, fontdict={"size": 13})
-plt.title("Influence of manipulations on Recall", fontdict={"size": 15})
 plt.tight_layout()
+plt.savefig("figures/manipulations_recall.pdf")
+plt.show()
 # %%
 # sns.set_style("whitegrid", {'axes.grid' : False})
 manipulation = "minus1"
@@ -40,10 +42,42 @@ for i, model in enumerate(models):
     diff = data['test'][model].loc[metrics.index].values - data[manipulation][model].loc[metrics.index].values
     diff = diff.flatten()
     x = [metric[9:].capitalize() for metric in metrics.index]
-    graph = sns.scatterplot(x=x[1:], y=diff[1:], label=model)
-    graph.axhline(diff[0], color=nord_colors[i], lw=1)
-plt.title("Influence of phrase category on recall difference", fontdict={"size": 15})
+    graph = sns.scatterplot(x=x[1:], y=diff[1:], label=model_labels[i])
 plt.xlabel("Category", fontdict={"size": 13})
 plt.ylabel("Difference in Recall@1 between \n unscrambled and scrambled at word-level ", fontdict={"size": 13})
+plt.legend(loc='lower right', bbox_to_anchor=(0.9, 0))
 plt.tight_layout()
+plt.savefig("figures/phrase_category_recall_diff.pdf")
+plt.show()
 # %%
+filtered_perfs = []
+minus1_perfs = []
+for model in models:
+    filtered_perf = data['test_filtered'][model].loc[metric][0]
+    minus1_perf = data['minus1'][model].loc[metric][0]
+    filtered_perfs.append(filtered_perf)
+    minus1_perfs.append(minus1_perf)
+    sns.scatterplot(x=[minus1_perf],y=[filtered_perf])
+sns.regplot(x=minus1_perfs, y=filtered_perfs, scatter=False, line_kws={"color":"black", "lw":1.5, "ls":"--"}, ci=None)
+plt.xlabel("Robustness (Recall@1 with scrambling at word level)")
+plt.ylabel("Clean accuracy (Recall@1)")
+plt.legend(model_labels)
+plt.tight_layout()
+plt.savefig("figures/absolute_robustness_vs_clean.pdf")
+plt.show()
+# %%
+filtered_perfs = []
+robustness = []
+for model in models:
+    filtered_perf = data['test_filtered'][model].loc[metric][0]
+    minus1_perf = data['minus1'][model].loc[metric][0]
+    filtered_perfs.append(filtered_perf)
+    robustness.append(minus1_perf-filtered_perf)
+    sns.scatterplot(x=[minus1_perf-filtered_perf],y=[filtered_perf])
+sns.regplot(x=robustness, y=filtered_perfs, scatter=False, line_kws={"color":"black", "lw":1.5, "ls":"--"}, ci=None)
+plt.xlabel("Robustness (Recall@1 difference between\nword level scrambling and filtered)")
+plt.ylabel("Clean accuracy (Recall@1)")
+plt.legend(model_labels)
+plt.tight_layout()
+plt.savefig("figures/relative_robustness_vs_clean.pdf")
+plt.show()
