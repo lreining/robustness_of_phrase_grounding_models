@@ -1,14 +1,16 @@
-# mai
-## todos
-### group nlp
-- get dependency / constituency parsing working
+# Robustness of State-of-the-Art Visual Grounding Models using Corrupted Linguistic Dependency Structures
 
-### group models
-- get models running (test on flickr dataset)
+## Model Setups
+### GLIP
+We used the models provided on the following github page: [https://github.com/microsoft/GLIP]. Specifically we used GLIP-T (C), GLIP-T and GLIP-L.
 
-### models
-data taken from [https://paperswithcode.com/sota/phrase-grounding-on-flickr30k-entities-test]
-1. GLIP v2 [https://github.com/microsoft/GLIP]
-2. Fiber b [https://github.com/microsoft/fiber]
-3. Pevl [https://github.com/thunlp/pevl]
-4. MDETR [https://github.com/facebookresearch/multimodal/tree/main/examples/mdetr#phrase-grounding]
+To test the models, complete the following steps:
+0. If you haven't downloaded the models yet run the run_models.sh file
+1. To start the docker image run the run_docker.sh file. Adjust the mounts as needed
+2. Within the docker image, run the run_models.sh file. Adjust the output directory
+
+### Fiber
+
+### MDETR
+
+## Dataset and variations
