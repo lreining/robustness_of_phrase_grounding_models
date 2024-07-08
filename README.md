@@ -52,6 +52,15 @@ To test the models, complete the following steps:
 2. Within the docker image, run the run_models.sh file. Adjust the output directory
 
 ### Fiber
+Just like GLIP, we used a model provided by the following GitHub page: [https://github.com/microsoft/FIBER]. 
+
+To test the model, complete the following steps:
+0. Navigate to the FIBER folder
+1. Run the 'docker_run.sh' file to pull and run the necessary docker environment for running the model
+    a. Make sure to adjust mounting directories accordingly   
+3. Navigate to the actual model
+4. Run the 'setup_and_run.sh' file
+    a. Also adjust paths as needed. For more information, refer to [https://github.com/microsoft/FIBER/blob/main/fine_grained/README.md]
 
 ### MDETR
 
