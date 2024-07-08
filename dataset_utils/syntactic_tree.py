@@ -1,6 +1,7 @@
 import benepar, spacy
 import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 
 benepar.download("benepar_en3")
 nlp = spacy.load("en_core_web_sm",disable=['ner', 'tok2vec'])
@@ -53,6 +54,9 @@ class SyntacticTree:
                 nodes += n.children
                 counts += [len(n.children)]
         return counts
+
+    def get_max_height(self):
+        return np.max(self.get_heights())
 
     def get_heights(self):
         counts = [0]
