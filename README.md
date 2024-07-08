@@ -57,10 +57,10 @@ Just like GLIP, we used a model provided by the following GitHub page: [https://
 To test the model, complete the following steps:
 0. Navigate to the FIBER folder
 1. Run the 'docker_run.sh' file to pull and run the necessary docker environment for running the model
-    a. Make sure to adjust mounting directories accordingly   
-3. Navigate to the actual model
-4. Run the 'setup_and_run.sh' file
-    a. Also adjust paths as needed. For more information, refer to [https://github.com/microsoft/FIBER/blob/main/fine_grained/README.md]
+   1. Make sure to adjust mounting directories accordingly   
+2. Navigate to the actual model (folder: '/FIBER/FIBER')
+3. Run the 'setup_and_run.sh' file
+   1. Also adjust paths as needed. For more information, refer to [https://github.com/microsoft/FIBER/blob/main/fine_grained/README.md]
 
 ### MDETR
 
