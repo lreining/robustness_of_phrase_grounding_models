@@ -44,24 +44,36 @@ Scrambling was performed using the `create_test_dataset.py` script.
 ## Model Setups
 
 ### GLIP
-We used the models provided on the following github page: [https://github.com/microsoft/GLIP]. Specifically we used GLIP-T (C), GLIP-T and GLIP-L.
+We used the models provided on the following GitHub page: [https://github.com/microsoft/GLIP]. Specifically we used GLIP-T (C), GLIP-T and GLIP-L. The code was published under MIT license.
 
 To test the models, complete the following steps:
 0. If you haven't downloaded the models yet run the run_models.sh file
-1. To start the docker image run the run_docker.sh file. Adjust the mounts as needed
-2. Within the docker image, run the run_models.sh file. Adjust the output directory
+1. To start the docker image run the `run_docker.sh` file. Adjust the mounts as needed
+2. Within the docker image, run the `run_models.sh` file. Adjust the output directory
 
 ### Fiber
 Just like GLIP, we used a model provided by the following GitHub page: [https://github.com/microsoft/FIBER]. 
 
 To test the model, complete the following steps:
 0. Navigate to the FIBER folder
-1. Run the 'docker_run.sh' file to pull and run the necessary docker environment for running the model
+1. Run the `docker_run.sh` file to pull and run the necessary docker environment for running the model
    1. Make sure to adjust mounting directories accordingly   
-2. Navigate to the actual model (folder: '/FIBER/FIBER')
-3. Run the 'setup_and_run.sh' file
+2. Navigate to the actual model (folder: `/FIBER/FIBER`)
+3. Run the `setup_and_run.sh` file
    1. Also adjust paths as needed. For more information, refer to [https://github.com/microsoft/FIBER/blob/main/fine_grained/README.md]
 
 ### MDETR
+The MDETR code was provided by Facebook Research and can be found on this GitHub page: [https://github.com/facebookresearch/multimodal/tree/main]. The code is slightly adjusted to use for our purposes and make it more concise. The mdetr code was published under a BSD-3-Clause license.
+
+To test the model, complete the following steps:
+0. Adjust the parameters in the `phrase_grounding.json` file located in `./mdetr `
+  0. `device`: device to compute the metrics on
+  1. `flickr_img_path`: path of the images
+  2. `flickr_dataset_path`: path of the whole dataset folder
+  3. `flickr_ann_path`: path of the annotations files
+  4. The other parameter can also be adjusted, but are optional
+1. Navugate to the mdetr folder
+2. Run `python phrase_grounding.py` 
+3. After running the experiments, the results can be found in `./mdetr/results`  
 
 ## Dataset and variations
