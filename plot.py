@@ -1,3 +1,5 @@
+# %% [markdown]
+# In this notebook, we will analyze the results of the evaluation of the models on the flickr30k dataset.
 # %%
 import os
 import matplotlib.pyplot as plt
@@ -5,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 # %%
+# load the results for all models and manipulations conditions
 evaluation_path = "evaluation_results"
 models = ["glip_large_model", "glip_tiny_model_o365_goldg_cc_sbu", "glip_tiny_model_o365_goldg", "mdetr", "fiber"]
 model_labels = ["GLIP Large", "GLIP Tiny (O365+GoldG+CC+SBU)", "GLIP Tiny (O365+GoldG)", "MDETR", "Fiber"]
@@ -18,6 +21,7 @@ for manipulation in manipulations:
     data[manipulation] = df
 
 # %%
+# plot the clean accuracy for all models and manipulations
 sns.set_theme()
 nord_colors = ["#5e81ac", "#81a1c1", "#88c0d0", "#bf616a", "#ebcb8b"]
 sns.set_palette(nord_colors)
@@ -34,7 +38,7 @@ plt.tight_layout()
 plt.savefig("figures/manipulations_recall.pdf")
 plt.show()
 # %%
-# sns.set_style("whitegrid", {'axes.grid' : False})
+# plot the influence of category on the clean accuracy
 manipulation = "minus1"
 metrics = data['test'][models[0]][data['test'][models[0]].index.str.startswith("Recall@1_")]
 plt.figure(figsize=(9,6))
@@ -50,6 +54,8 @@ plt.tight_layout()
 plt.savefig("figures/phrase_category_recall_diff.pdf")
 plt.show()
 # %%
+# plot the relationship between clean accuracy and accuracy when scrambled at
+# word level
 filtered_perfs = []
 minus1_perfs = []
 for model in models:
@@ -66,6 +72,7 @@ plt.tight_layout()
 plt.savefig("figures/absolute_robustness_vs_clean.pdf")
 plt.show()
 # %%
+# plot the relationship between clean accuracy and relative robustness
 filtered_perfs = []
 robustness = []
 for model in models:
@@ -81,4 +88,3 @@ plt.legend(model_labels)
 plt.tight_layout()
 plt.savefig("figures/relative_robustness_vs_clean.pdf")
 plt.show()
-# %%

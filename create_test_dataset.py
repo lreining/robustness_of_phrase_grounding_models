@@ -1,3 +1,9 @@
+# %% [markdown]
+# This notebook creates the dataset we used in our analysis. We first filter the
+# dataset to remove sentences that can not be scrambled at least 2 levels deep.
+# Then we scramble the dataset at different levels of scrambling. We scramble
+# the dataset at word level, at an intermediate level (0.5), and at two other
+# intermediate levels (1/3 and 2/3).
 # %%
 import json
 
@@ -6,6 +12,7 @@ from tqdm import tqdm
 from dataset_utils.syntactic_manipulation import is_masked_sentence_deeper_than, scramble_dataset
 
 # %%
+# load the flickr30k entities test dataset
 annotation_file = "flickr_test_datasets/final_flickr_separateGT_test.json"
 with open(annotation_file, "r") as f:
     dataset = json.load(f)
@@ -26,6 +33,7 @@ for i in sorted(excluds, reverse=True):
 with open(filtered_dataset_file, 'w') as f:
     json.dump(dataset, f)
 # %%
+# load the filtered dataset
 with open(filtered_dataset_file, "r") as f:
     dataset = json.load(f)
 
@@ -81,4 +89,3 @@ dataset_scrambled = scramble_dataset(dataset, level=-1, is_phrase_scrambled=True
 dataset_scrambled_file = "flickr_test_datasets/final_flickr_separateGT_test_scrambled_-1_scramble_within.json"
 with open(dataset_scrambled_file, 'w') as f:
     json.dump(dataset_scrambled, f)
-# %%
