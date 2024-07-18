@@ -23,7 +23,7 @@ less syntactic structure.
 
 ### Directories:
 
-- `./dataset_utils`: Utils for working with the flickr30k dataset.
+- `./src`: Utils for working with the flickr30k dataset.
 - `./flicker_test_dataset`: Contains annotations which are scrambled at different
   syntactic depths.
 - .`/flickr_test_datasets_sentence_metrics`: Contains different evaluation results
@@ -44,18 +44,18 @@ We provide an open-source method for corrupting sentences of the flickr30k entit
 the original sentence structure is preserved.
 
 To perform the scrambling:
-- for single sentence: `dataset_utils.syntactic_manipulation.scramble`
-- for whole dataset: `dataset_utils.syntactic_manipulation.scramble_dataset`
+- for single sentence: `src.syntactic_manipulation.scramble`
+- for whole dataset: `src.syntactic_manipulation.scramble_dataset`
 
 For example on usage, refer to `create_test_dataset.py`.
 
 
 Our approach to scramble sentence s at level l:
-0. Sentence is converted to lowercase and punctuation is removed
-1. The target phrases - given by their index bounds `phrase_idx_bounds` - are masked so that their structure will be preserved (if such behavior is not desired: `is_phrase_scrambled = True`)
-2. Construct the syntactic tree (`dataset_utils.syntactic_tree.SyntacticTree`) of the sentence that is to be scrambled
-3. Retrieve constituent parts at level min(l, i) for each branch of the syntactic tree where l refers to the scrambling level and i to the maximum height of the current branch
-4. Shuffle original sentence s based on constituent parts
+1. Sentence is converted to lowercase and punctuation is removed
+2. The target phrases - given by their index bounds `phrase_idx_bounds` - are masked so that their structure will be preserved (if such behavior is not desired: `is_phrase_scrambled = True`)
+3. Construct the syntactic tree (`src.syntactic_tree.SyntacticTree`) of the sentence that is to be scrambled
+4. Retrieve constituent parts at level min(l, i) for each branch of the syntactic tree where l refers to the scrambling level and i to the maximum height of the current branch
+5. Shuffle original sentence s based on constituent parts
 
 
 ## Model Setups
@@ -64,6 +64,7 @@ Our approach to scramble sentence s at level l:
 We used the models provided on the following GitHub page: [https://github.com/microsoft/GLIP]. Specifically we used GLIP-T (C), GLIP-T and GLIP-L. The code was published under MIT license.
 
 To test the models, complete the following steps:
+
 0. If you haven't downloaded the models yet run the run_models.sh file
 1. To start the docker image run the `run_docker.sh` file. Adjust the mounts as needed
 2. Within the docker image, run the `run_models.sh` file. Adjust the output directory
@@ -72,6 +73,7 @@ To test the models, complete the following steps:
 Just like GLIP, we used a model provided by the following GitHub page: [https://github.com/microsoft/FIBER]. 
 
 To test the model, complete the following steps:
+
 0. Navigate to the FIBER folder
 1. Run the `docker_run.sh` file to pull and run the necessary docker environment for running the model
    1. Make sure to adjust mounting directories accordingly   
@@ -83,6 +85,7 @@ To test the model, complete the following steps:
 The MDETR code was provided by Facebook Research and can be found on this GitHub page: [https://github.com/facebookresearch/multimodal/tree/main]. The code is slightly adjusted to use for our purposes and make it more concise. The mdetr code was published under a BSD-3-Clause license.
 
 To test the model, complete the following steps:
+
 0. Adjust the parameters in the `phrase_grounding.json` file located in `./mdetr `
   0. `device`: device to compute the metrics on
   1. `flickr_img_path`: path of the images
