@@ -41,6 +41,26 @@ was created by scrambling the dependency structure of the sentences in the
 flickr30k dataset. Here, we provide scrambled versions of the test dataset.
 Scrambling was performed using the `create_test_dataset.py` script.
 
+### Manipulations
+
+We provide an open-source method for corrupting sentences of the flickr30k entities dataset with systematic control of the degree to which
+the original sentence structure is preserved.
+
+To perform the scrambling:
+- for single sentence: `dataset_utils.syntactic_manipulation.scramble`
+- for whole dataset: `dataset_utils.syntactic_manipulation.scramble_dataset`
+
+For example on usage, refer to `create_test_dataset.py`.
+
+
+Our approach to scramble sentence s at level l:
+0. Sentence is converted to lowercase and punctuation is removed
+1. The target phrases - given by their index bounds `phrase_idx_bounds` - are masked so that their structure will be preserved (if such behavior is not desired: `is_phrase_scrambled = True`)
+2. Construct the syntactic tree (`dataset_utils.syntactic_tree.SyntacticTree`) of the sentence that is to be scrambled
+3. Retrieve constituent parts at level min(l, i) for each branch of the syntactic tree where l refers to the scrambling level and i to the maximum height of the current branch
+4. Shuffle original sentence s based on constituent parts
+
+
 ## Model Setups
 
 ### GLIP
@@ -76,4 +96,3 @@ To test the model, complete the following steps:
 2. Run `python phrase_grounding.py` 
 3. After running the experiments, the results can be found in `./mdetr/results`  
 
-## Dataset and variations
