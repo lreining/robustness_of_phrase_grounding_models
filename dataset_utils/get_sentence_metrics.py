@@ -7,6 +7,17 @@ from pyxdameraulevenshtein import normalized_damerau_levenshtein_distance
 
 
 def compute_distances_for_scrambled_sentences(path=None):
+    """
+    Computes the normalized Damerau-Levenshtein distances between original captions and manipulated captions
+    for a set of scrambled sentences.
+
+    Parameters:
+    - path (str, optional): The path to save the output CSV file. Defaults to None.
+
+    Returns:
+    - None
+    """
+    
     manipulations = ["-1", "point66", "point5", "point33"]
     manipulated_file_names = [f"../flickr_test_datasets/final_flickr_separateGT_test_scrambled_{manipulation}.json" for manipulation in manipulations]
     original_file_name = f"../flickr_test_datasets/final_flickr_separateGT_test_filtered.json"
@@ -38,7 +49,17 @@ def compute_distances_for_scrambled_sentences(path=None):
     for f in [original_file] + manipulated_files:
         f.close()
 
-def dataset_summary(dataset_name,path=None):
+def dataset_summary(dataset_name, path=None):
+    """
+    Generates a summary of sentence metrics for a given dataset.
+
+    Parameters:
+    - dataset_name (str): The name of the dataset.
+    - path (str, optional): The path to save the summary CSV file. Defaults to None.
+
+    Returns:
+    - None
+    """
     file = f"../flickr_test_datasets/final_flickr_separateGT_test_{dataset_name}.json"
     with open(file, "r") as f:
         dataset = json.load(f)
