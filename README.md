@@ -23,9 +23,6 @@ less syntactic structure.
 
 ### Directories:
 
-- `./GLIP`: Contains the code for the GLIP models.
-- `./Fiber`: Contains the code for the Fiber model.
-- `./MDETR`: Contains the code for the MDETR model.
 - `./dataset_utils`: Utils for working with the flickr30k dataset.
 - `./flicker_test_dataset`: Contains annotations which are scrambled at different
   syntactic depths.
